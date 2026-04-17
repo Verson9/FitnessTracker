@@ -1,65 +1,47 @@
 package pl.wsb.fitnesstracker.healthmetrics.api;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import pl.wsb.fitnesstracker.user.api.User;
 
 import java.time.LocalDate;
 
+
 @Entity
-@Table(name = "HEALTH_METRICS")
+@Table(name = "Health_Metrics")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-@ToString
 public class HealthMetrics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Nullable
     private Long id;
 
-    @Column(name = "measured_at", nullable = false)
-    private LocalDate measuredAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "weight_kg")
-    @Nullable
-    private Double weightKg;
+    @Column(nullable = false)
+    private LocalDate date;
 
-    @Column(name = "height_cm")
-    @Nullable
-    private Double heightCm;
+    @Column
+    private Double weight;
 
-    @Column(name = "resting_heart_rate")
-    @Nullable
-    private Integer restingHeartRate;
+    @Column
+    private Double height;
 
-    @Column(name = "blood_pressure_systolic")
-    @Nullable
-    private Integer bloodPressureSystolic;
+    @Column(name = "heart_rate")
+    private Integer heartRate;
 
-    @Column(name = "blood_pressure_diastolic")
-    @Nullable
-    private Integer bloodPressureDiastolic;
-
-    @Column(name = "body_fat_percent")
-    @Nullable
-    private Double bodyFatPercentage;
-
-    @Column(name = "sleep_hours")
-    @Nullable
-    private Double sleepHours;
-
-    @Column(name = "steps")
-    @Nullable
-    private Integer steps;
-
+    public HealthMetrics(User user, LocalDate date, Double weight, Double height, Integer heartRate) {
+        this.user = user;
+        this.date = date;
+        this.weight = weight;
+        this.height = height;
+        this.heartRate = heartRate;
+    }
 }

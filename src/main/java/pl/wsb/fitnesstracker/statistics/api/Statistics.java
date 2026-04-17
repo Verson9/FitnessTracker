@@ -1,11 +1,11 @@
 package pl.wsb.fitnesstracker.statistics.api;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import pl.wsb.fitnesstracker.user.api.User;
 
 @Entity
 @Table(name = "Statistics")
@@ -16,16 +16,23 @@ public class Statistics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Nullable
     private Long id;
 
-    private int totalTrainings;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
-    private double totalDistance;
+    @Column(name = "total_trainings")
+    private Integer totalTrainings;
 
-    private int totalCaloriesBurned;
+    @Column(name = "total_distance")
+    private Integer totalDistance;
 
-    public Statistics(int totalTrainings, double totalDistance, int totalCaloriesBurned) {
+    @Column(name = "total_calories_burned")
+    private Integer totalCaloriesBurned;
+
+    public Statistics(User user, Integer totalTrainings, Integer totalDistance, Integer totalCaloriesBurned) {
+        this.user = user;
         this.totalTrainings = totalTrainings;
         this.totalDistance = totalDistance;
         this.totalCaloriesBurned = totalCaloriesBurned;

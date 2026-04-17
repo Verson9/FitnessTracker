@@ -6,15 +6,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import pl.wsb.fitnesstracker.event.Event;
+import pl.wsb.fitnesstracker.event.EventsRepository;
+import pl.wsb.fitnesstracker.healthmetrics.api.HealthMetrics;
+import pl.wsb.fitnesstracker.healthmetrics.api.HealthMetricsRepository;
+import pl.wsb.fitnesstracker.statistics.api.Statistics;
+import pl.wsb.fitnesstracker.statistics.api.StatisticsRepository;
 import pl.wsb.fitnesstracker.training.api.Training;
 import pl.wsb.fitnesstracker.training.internal.ActivityType;
+import pl.wsb.fitnesstracker.training.internal.TrainingRepository;
 import pl.wsb.fitnesstracker.user.api.User;
+import pl.wsb.fitnesstracker.user.internal.UserRepository;
+import pl.wsb.fitnesstracker.userevent.UserEvent;
+import pl.wsb.fitnesstracker.userevent.UserEventRepository;
+import pl.wsb.fitnesstracker.workoutsession.WorkoutSession;
+import pl.wsb.fitnesstracker.workoutsession.WorkoutSessionsRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +45,13 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 class InitialDataLoader {
 
-    private final JpaRepository<User, Long> userRepository;
-
-    private final JpaRepository<Training, Long> trainingRepository;
+    private final UserRepository userRepository;
+    private final TrainingRepository trainingRepository;
+    private final HealthMetricsRepository healthMetricsRepository;
+    private final WorkoutSessionsRepository workoutSessionsRepository;
+    private final StatisticsRepository statisticsRepository;
+    private final EventsRepository eventsRepository;
+    private final UserEventRepository userEventRepository;
 
     @EventListener
     @Transactional
@@ -45,18 +62,13 @@ class InitialDataLoader {
         log.info("Loading initial data to the database");
 
         List<User> sampleUserList = generateSampleUsers();
+        generateUserStatistics(sampleUserList);
+        generateHealthMetrics(sampleUserList);
         List<Training> sampleTrainingList = generateTrainingData(sampleUserList);
-
+        generateWorkoutSessionData(sampleTrainingList);
+        generateEvents(sampleUserList);
 
         log.info("Finished loading initial data");
-    }
-
-    private User generateUser(String name, String lastName, int age) {
-        User user = new User(name,
-                lastName,
-                now().minusYears(age),
-                "%s.%s@domain.com".formatted(name, lastName));
-        return userRepository.save(user);
     }
 
     private List<User> generateSampleUsers() {
@@ -74,6 +86,40 @@ class InitialDataLoader {
         users.add(generateUser("Oliver", "Swift", 29));
 
         return users;
+    }
+
+    private User generateUser(String name, String lastName, int age) {
+        User user = new User(name,
+                lastName,
+                now().minusYears(age),
+                "%s.%s@domain.com".formatted(name, lastName));
+        return userRepository.save(user);
+    }
+
+    private void generateUserStatistics(List<User> users) {
+        List<Statistics> statistics = new ArrayList<>();
+        users.forEach(user -> {
+            new Statistics(
+                    user,
+                    (int) (Math.random() * 10),
+                    (int) (Math.random() * 10),
+                    (int) (Math.random() * 10)
+            );
+        });
+        statisticsRepository.saveAll(statistics);
+    }
+
+    private void generateHealthMetrics(List<User> users) {
+        List<HealthMetrics> healthMetrics = new ArrayList<>();
+
+        for (User user : users) {
+            healthMetrics.add(new HealthMetrics(user,
+                    now(),
+                    Math.random() * 200 ,
+                    Math.random() * 200 ,
+                    (int) (Math.random() * 200 )));
+        }
+        healthMetricsRepository.saveAll(healthMetrics);
     }
 
     private List<Training> generateTrainingData(List<User> users) {
@@ -160,6 +206,45 @@ class InitialDataLoader {
         }
 
         return trainingData;
+    }
+
+    private void generateWorkoutSessionData(List<Training> trainings) {
+        List<WorkoutSession> workoutSessions = new ArrayList<>();
+        for (Training training : trainings) {
+            workoutSessions.add(new WorkoutSession(
+                    training,
+                    LocalDateTime.now(),
+                    Math.random() * 200 ,
+                    Math.random() * 200 ,
+                    Math.random() * 200 ));
+        }
+        workoutSessionsRepository.saveAll(workoutSessions);
+    }
+
+    private void generateEvents(List<User> users) {
+        for (User user : users) {
+            List<Event> events = new ArrayList<>();
+            List<UserEvent> userEvents = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                Event event = new Event(
+                        "event_%s_%d".formatted(user.getEmail(), i),
+                        "event_%s_%d_desc".formatted(user.getEmail(), i),
+                        LocalDateTime.now(),
+                        "Poland",
+                        "Wrocław"
+                );
+                if (i % 2 == 0) {
+                    event.setEndTime(LocalDateTime.now().plus(i, ChronoUnit.MINUTES));
+                }
+                events.add(event);
+            }
+            List<Event> savedEvents = eventsRepository.saveAll(events);
+            for (Event event : savedEvents) {
+                userEvents.add(new UserEvent(user,event, ""));
+            }
+            userEventRepository.saveAll(userEvents);
+
+        }
     }
 
     private void verifyDependenciesAutowired() {
