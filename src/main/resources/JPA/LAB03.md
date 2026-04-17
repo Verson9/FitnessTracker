@@ -31,8 +31,7 @@ przez które aplikacja **czyta i zapisuje** dane. Plan zajęć (1.5h):
     - **Przekopiuj** plik testowy `Lab03EntitiesTest.java` z
       `src/main/resources/JPA/LAB03/` do `src/test/java/pl/wsb/fitnesstracker/`.
       Ten test sprawdza, że nowe tabele (`event`, `user_event`, `workout_session`)
-      powstały po dodaniu encji z sekcji 1. Zapytania z sekcji 3 i 4 weryfikujesz
-      samodzielnie (np. wypisując wynik w `InitialDataLoader`).
+      powstały po dodaniu encji z sekcji 1.
 
 ---
 
