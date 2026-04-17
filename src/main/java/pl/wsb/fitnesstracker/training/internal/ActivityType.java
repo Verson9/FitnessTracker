@@ -25,6 +25,9 @@ public class ActivityType {
 
     private String displayName;
 
+    @Column(name = "activity_type", nullable = false, unique = true)
+    private String activityType;
+
     @OneToMany(mappedBy = "activityType")
     private List<Training> trainings;
 

@@ -16,7 +16,6 @@ import pl.wsb.fitnesstracker.statistics.api.Statistics;
 import pl.wsb.fitnesstracker.statistics.api.StatisticsRepository;
 import pl.wsb.fitnesstracker.training.api.Training;
 import pl.wsb.fitnesstracker.training.internal.ActivityType;
-import pl.wsb.fitnesstracker.training.internal.ActivityTypeRepository;
 import pl.wsb.fitnesstracker.training.internal.TrainingRepository;
 import pl.wsb.fitnesstracker.user.api.User;
 import pl.wsb.fitnesstracker.user.internal.UserRepository;
@@ -53,7 +52,6 @@ class InitialDataLoader {
     private final StatisticsRepository statisticsRepository;
     private final EventsRepository eventsRepository;
     private final UserEventRepository userEventRepository;
-    private final ActivityTypeRepository activityTypeRepository;
 
     @EventListener
     @Transactional
@@ -66,16 +64,11 @@ class InitialDataLoader {
         List<User> sampleUserList = generateSampleUsers();
         generateUserStatistics(sampleUserList);
         generateHealthMetrics(sampleUserList);
-        saveActivityTypes(activityTypeRepository);
         List<Training> sampleTrainingList = generateTrainingData(sampleUserList);
         generateWorkoutSessionData(sampleTrainingList);
         generateEvents(sampleUserList);
 
         log.info("Finished loading initial data");
-    }
-
-    private void saveActivityTypes(ActivityTypeRepository activityTypeRepository) {
-        activityTypeRepository.saveDefaultActivityTypes();
     }
 
     private List<User> generateSampleUsers() {
