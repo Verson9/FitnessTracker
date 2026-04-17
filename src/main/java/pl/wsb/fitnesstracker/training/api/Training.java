@@ -1,49 +1,61 @@
 package pl.wsb.fitnesstracker.training.api;
 
+import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 import pl.wsb.fitnesstracker.training.internal.ActivityType;
 import pl.wsb.fitnesstracker.user.api.User;
 import pl.wsb.fitnesstracker.workoutsession.WorkoutSession;
 
 import java.util.Date;
+import java.util.List;
 
-@Getter
 @Entity
-@Table(name = "Trainings")
-@NoArgsConstructor
+@Table(name = "trainings")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Training {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Nullable
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "start_time", nullable = false)
     private Date startTime;
 
-    @Setter
+    @Column(name = "end_time", nullable = false)
     private Date endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "activity_type_id")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "activity_type", nullable = false)
     private ActivityType activityType;
 
-    @Column
-    private Double distance;
+    @Column(nullable = false)
+    private double distance;
 
-    @Column(name = "average_speed")
-    private Double averageSpeed;
+    @Column(name = "average_speed", nullable = false)
+    private double averageSpeed;
 
-    @OneToOne(mappedBy = "training", cascade = CascadeType.ALL, orphanRemoval = true)
-    private WorkoutSession workoutSession;
+    @OneToMany(mappedBy = "workoutsession", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkoutSession> workoutSessions;
 
-    public Training(User user, Date startTime, Date endTime, ActivityType activityType, double distance, double averageSpeed) {
+    public Training(
+            final User user,
+            final Date startTime,
+            final Date endTime,
+            final ActivityType activityType,
+            final double distance,
+            final double averageSpeed) {
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
