@@ -31,7 +31,7 @@ public class Training {
     private Date endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "activity_type", referencedColumnName = "activity_type")
+    @JoinColumn(name = "activity_type_id")
     private ActivityType activityType;
 
     @Column
