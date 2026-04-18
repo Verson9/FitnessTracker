@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.wsb.fitnesstracker.event.Event;
 import pl.wsb.fitnesstracker.event.EventsRepository;
-import pl.wsb.fitnesstracker.healthmetrics.api.HealthMetrics;
-import pl.wsb.fitnesstracker.healthmetrics.api.HealthMetricsRepository;
+import pl.wsb.fitnesstracker.healthmetrics.HealthMetrics;
+import pl.wsb.fitnesstracker.healthmetrics.HealthMetricsRepository;
 import pl.wsb.fitnesstracker.statistics.api.Statistics;
 import pl.wsb.fitnesstracker.statistics.api.StatisticsRepository;
 import pl.wsb.fitnesstracker.training.api.Training;
@@ -70,6 +70,10 @@ class InitialDataLoader {
         List<Training> sampleTrainingList = generateTrainingData(sampleUserList);
         generateWorkoutSessionData(sampleTrainingList);
         generateEvents(sampleUserList);
+
+        System.out.println(eventsRepository.findEventNamesWithParticipantCountProjection());
+
+        System.out.println(trainingRepository.getTotalUserDistance(sampleUserList.get(0)));
 
         log.info("Finished loading initial data");
     }

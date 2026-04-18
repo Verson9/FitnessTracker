@@ -39,5 +39,4 @@ public class ActivityType {
         this.code = code;
         this.displayName = displayName;
     }
-
 }
