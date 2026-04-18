@@ -3,7 +3,6 @@ package pl.wsb.fitnesstracker.training.api;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,6 +12,7 @@ import pl.wsb.fitnesstracker.workoutsession.WorkoutSession;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "trainings")
@@ -46,8 +46,8 @@ public class Training {
     @Column(name = "average_speed", nullable = false)
     private double averageSpeed;
 
-    @OneToMany(mappedBy = "workoutsession", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorkoutSession> workoutSessions;
+    @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkoutSession> workoutSessions = new ArrayList<>();
 
     public Training(
             final User user,

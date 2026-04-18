@@ -71,7 +71,12 @@ class InitialDataLoader {
         generateWorkoutSessionData(sampleTrainingList);
         generateEvents(sampleUserList);
 
-        System.out.println(eventsRepository.findEventNamesWithParticipantCountProjection());
+        java.util.List<pl.wsb.fitnesstracker.event.EventNameParticipantsProjection> projectionList =
+                eventsRepository.findEventNamesWithParticipantCountProjection();
+        java.util.Map<String, Long> eventParticipants = projectionList.stream()
+                .collect(java.util.stream.Collectors.toMap(pl.wsb.fitnesstracker.event.EventNameParticipantsProjection::getName,
+                        pl.wsb.fitnesstracker.event.EventNameParticipantsProjection::getParticipants));
+        System.out.println(eventParticipants);
 
         System.out.println(trainingRepository.getTotalUserDistance(sampleUserList.get(0)));
 

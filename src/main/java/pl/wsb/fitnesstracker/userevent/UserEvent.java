@@ -8,7 +8,7 @@ import pl.wsb.fitnesstracker.event.Event;
 import pl.wsb.fitnesstracker.user.api.User;
 
 @Entity
-@Table(name = "User_Events")
+@Table(name = "user_event")
 @NoArgsConstructor
 @Getter
 public class UserEvent {

@@ -6,7 +6,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public interface EventsRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.startTime > :now ORDER BY e.startTime")
@@ -16,6 +15,6 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
             "FROM Event e LEFT JOIN e.userEvents ue " +
             "GROUP BY e.name " +
             "ORDER BY e.name")
-    Map<String, Long> findEventNamesWithParticipantCountProjection();
+    List<EventNameParticipantsProjection> findEventNamesWithParticipantCountProjection();
 
 }
